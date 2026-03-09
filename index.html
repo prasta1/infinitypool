@@ -915,7 +915,7 @@
             <button class="tab-btn" onclick="showTab('vote')">Cast Votes</button>
             <button class="tab-btn" onclick="showTab('leaderboard')">Leaderboard</button>
             <button class="tab-btn" onclick="showTab('history')">History</button>
-            <button class="tab-btn" onclick="showTab('admin')">Admin</button>
+            <button class="tab-btn" id="admin-tab-btn" onclick="showTab('admin')">Admin</button>
         </div>
 
         <!-- THE BOARD -->
@@ -1018,11 +1018,14 @@
 
     <script>
         // ─── Access Control ──────────────────────────────
+        const ADMIN_HASH = '6eab6f8b4d895bece4fef435698b2593d4fb31710c243c443235c5410616148a'; // EDGE-LORD-6287
+
         const ACCESS_KEYS = {
             '32e9dfce7541b8e183daa0a7a88c80737b85a37406baaed86bc5bedd8b987dcc': 'Holder 1', // EDGE-KRAKEN-9322
             '5670a91544b98b5fee3206c415f45464d4b2a248cb7ec73bd0b40ba26af972e8': 'Holder 2', // EDGE-SPECTER-9164
             '6f9a02368a4eb8504f13c46b08f97a82a53a41f82702e1bd52a21fb765fccfb6': 'Holder 3', // EDGE-TORRENT-9500
             '4ce5f558d1f51963f9f333a676f4a0db2cdd97f73434e39e49a52ab8dfc44d17': 'Holder 4', // EDGE-MIRAGE-6813
+            [ADMIN_HASH]: 'Admin', // EDGE-LORD-6287
         };
 
         const SESSION_KEY = 'infinity_pool_session';
@@ -1066,6 +1069,7 @@
             document.getElementById('lock-screen').classList.add('hidden');
             document.getElementById('app-container').style.display = '';
             document.getElementById('session-user').textContent = userName;
+            document.getElementById('admin-tab-btn').style.display = isAdmin() ? '' : 'none';
             render();
         }
 
@@ -1169,7 +1173,13 @@
         }
 
         // ─── Tab Navigation ──────────────────────────────
+        function isAdmin() {
+            const session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || '{}');
+            return session.hash === ADMIN_HASH;
+        }
+
         function showTab(tab) {
+            if (tab === 'admin' && !isAdmin()) return;
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`section-${tab}`).classList.add('active');

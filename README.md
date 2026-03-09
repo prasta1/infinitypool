@@ -26,16 +26,17 @@ python3 -m http.server 8000
 
 ## Access Keys
 
-The site requires one of four unique keys to enter:
+The site requires one of five unique keys to enter:
 
-| Key                | Holder   |
+| Key                | Role     |
 |--------------------|----------|
 | `EDGE-KRAKEN-9322`  | Holder 1 |
 | `EDGE-SPECTER-9164` | Holder 2 |
 | `EDGE-TORRENT-9500` | Holder 3 |
 | `EDGE-MIRAGE-6813`  | Holder 4 |
+| `EDGE-LORD-6287`    | Admin    |
 
-Keys are verified client-side against SHA-256 hashes. Sessions persist per tab.
+Only the Admin key grants access to the Admin panel (manage teammates, voters, rounds, departures). Keys are verified client-side against SHA-256 hashes. Sessions persist per tab.
 
 ## Data Storage
 
