@@ -870,6 +870,131 @@
             }
         }
 
+        /* Oregon Trail Death Screen */
+        .oregon-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #000;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            animation: oregonFadeIn 1s ease;
+            cursor: pointer;
+        }
+
+        .oregon-overlay * {
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+            text-align: center;
+        }
+
+        .oregon-tombstone {
+            position: relative;
+            width: 280px;
+            padding: 40px 30px 30px;
+            margin-bottom: 30px;
+            animation: tombstoneRise 1.5s ease-out;
+        }
+
+        .oregon-tombstone::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 240px;
+            height: 100%;
+            border: 3px solid #00ff00;
+            border-radius: 120px 120px 0 0;
+        }
+
+        .tombstone-cross {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            animation: crossGlow 2s infinite;
+        }
+
+        .tombstone-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .tombstone-dates {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin: 5px 0;
+        }
+
+        .tombstone-epitaph {
+            font-size: 1rem;
+            margin-top: 15px;
+            font-style: italic;
+            line-height: 1.5;
+            max-width: 220px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .oregon-cause {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            animation: causeFlicker 0.1s 3;
+            letter-spacing: 1px;
+        }
+
+        .oregon-ground {
+            width: 100%;
+            position: absolute;
+            bottom: 60px;
+            left: 0;
+            text-align: center;
+            font-size: 0.8rem;
+            opacity: 0.4;
+            letter-spacing: 8px;
+        }
+
+        .oregon-continue {
+            position: absolute;
+            bottom: 25px;
+            font-size: 0.85rem;
+            opacity: 0;
+            animation: continueBlink 1s 3s forwards, continuePulse 2s 4s infinite;
+        }
+
+        @keyframes oregonFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes tombstoneRise {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes crossGlow {
+            0%, 100% { text-shadow: 0 0 10px #00ff00; }
+            50% { text-shadow: 0 0 25px #00ff00, 0 0 50px #00aa00; }
+        }
+
+        @keyframes causeFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes continueBlink {
+            from { opacity: 0; }
+            to { opacity: 0.6; }
+        }
+
+        @keyframes continuePulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.3; }
+        }
+
         @media (max-width: 600px) {
             .logo { font-size: 2rem; }
             .container { padding: 12px; }
@@ -1029,6 +1154,106 @@
         };
 
         const SESSION_KEY = 'infinity_pool_session';
+        const SEEN_DEPARTURES_KEY = 'infinity_pool_seen_departures';
+
+        const OREGON_TRAIL_DEATHS = [
+            'has died of dysentery',
+            'has died of cholera',
+            'has died of typhoid',
+            'has died of measles',
+            'has died of a snakebite',
+            'drowned while fording the river',
+            'has died of exhaustion',
+            'has broken a leg and couldn\'t go on',
+            'was lost in a blizzard',
+            'was bitten by a rattlesnake',
+            'ate some bad berries',
+            'has died of starvation',
+            'was trampled by buffalo',
+            'fell off the wagon',
+            'has died of mountain fever',
+            'was struck by lightning',
+            'got lost scouting ahead and was never seen again',
+            'traded all supplies for magic beans',
+            'insisted on taking the shortcut',
+            'challenged a grizzly bear to a duel',
+            'tried to pet the buffalo',
+            'forgot to bring water. Again.',
+            'was carried off by a very large eagle',
+            'has perished in a caulking accident',
+        ];
+
+        function getSeenDepartures() {
+            try { return JSON.parse(localStorage.getItem(SEEN_DEPARTURES_KEY) || '[]'); }
+            catch { return []; }
+        }
+
+        function markDeparturesSeen(history) {
+            const ids = history.map((h, i) => `${h.departedName}-${h.date}-${i}`);
+            localStorage.setItem(SEEN_DEPARTURES_KEY, JSON.stringify(ids));
+        }
+
+        function getUnseenDepartures(history) {
+            const seen = getSeenDepartures();
+            const unseen = [];
+            history.forEach((h, i) => {
+                const id = `${h.departedName}-${h.date}-${i}`;
+                if (!seen.includes(id)) unseen.push(h);
+            });
+            return unseen;
+        }
+
+        function showOregonTrailDeath(departedName, onDone) {
+            const cause = OREGON_TRAIL_DEATHS[Math.floor(Math.random() * OREGON_TRAIL_DEATHS.length)];
+            const overlay = document.createElement('div');
+            overlay.className = 'oregon-overlay';
+            overlay.innerHTML = `
+                <div class="oregon-cause">${departedName} ${cause}.</div>
+                <div class="oregon-tombstone">
+                    <div class="tombstone-cross">&#x271D;</div>
+                    <div class="tombstone-name">${departedName}</div>
+                    <div class="tombstone-dates">Edge Impulse, ${new Date().getFullYear()}</div>
+                    <div class="tombstone-epitaph">"Here lies ${departedName.split(' ')[0]},<br>who ${cause}."</div>
+                </div>
+                <div class="oregon-ground">~~~~~~~~ &#x1F33F; ~~~~~~~~ &#x1F33F; ~~~~~~~~</div>
+                <div class="oregon-continue">Press SPACE or click to continue on the trail...</div>
+            `;
+
+            document.body.appendChild(overlay);
+
+            function dismiss() {
+                overlay.style.transition = 'opacity 0.8s';
+                overlay.style.opacity = '0';
+                setTimeout(() => { overlay.remove(); onDone(); }, 800);
+                document.removeEventListener('keydown', onKey);
+            }
+
+            function onKey(e) { if (e.code === 'Space' || e.key === 'Enter') dismiss(); }
+            overlay.addEventListener('click', dismiss);
+            document.addEventListener('keydown', onKey);
+        }
+
+        function showUnseenDepartures(callback) {
+            const stored = localStorage.getItem('infinity_pool_data');
+            if (!stored) { callback(); return; }
+            try {
+                const gameData = JSON.parse(stored);
+                const unseen = getUnseenDepartures(gameData.history || []);
+                if (unseen.length === 0) { callback(); return; }
+
+                // Show them one at a time, then mark all seen
+                let idx = 0;
+                function showNext() {
+                    if (idx >= unseen.length) {
+                        markDeparturesSeen(gameData.history);
+                        callback();
+                        return;
+                    }
+                    showOregonTrailDeath(unseen[idx].departedName, () => { idx++; showNext(); });
+                }
+                showNext();
+            } catch { callback(); }
+        }
 
         async function sha256(str) {
             const buf = await crypto.subtle.digest('SHA-256',
@@ -1067,10 +1292,13 @@
 
         function unlockApp(userName) {
             document.getElementById('lock-screen').classList.add('hidden');
-            document.getElementById('app-container').style.display = '';
             document.getElementById('session-user').textContent = userName;
             document.getElementById('admin-tab-btn').style.display = isAdmin() ? '' : 'none';
-            render();
+
+            showUnseenDepartures(() => {
+                document.getElementById('app-container').style.display = '';
+                render();
+            });
         }
 
         function logout() {
@@ -1489,6 +1717,7 @@
             });
 
             saveData(data);
+            markDeparturesSeen(data.history);
             render();
 
             if (correctVoters.length > 0) {
