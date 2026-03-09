@@ -367,17 +367,56 @@
         }
 
         /* Roster Grid */
+        .board-search {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .board-search input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .board-search input:focus {
+            border-color: var(--accent);
+        }
+
+        .board-search::before {
+            content: '\1F50D';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9rem;
+            opacity: 0.5;
+        }
+
+        .board-count {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
         .roster-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
         }
 
         .roster-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 10px;
+            padding: 12px 10px;
             text-align: center;
             transition: all 0.3s;
             position: relative;
@@ -385,24 +424,24 @@
         }
 
         .roster-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             border-color: var(--accent);
-            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
         }
 
         .roster-card.departed {
             border-color: var(--danger);
-            opacity: 0.6;
+            opacity: 0.5;
         }
 
         .roster-card.departed::after {
             content: 'DEPARTED';
             position: absolute;
-            top: 12px;
-            right: -30px;
+            top: 8px;
+            right: -32px;
             background: var(--danger);
             color: white;
-            font-size: 0.6rem;
+            font-size: 0.5rem;
             font-weight: 700;
             padding: 2px 35px;
             transform: rotate(45deg);
@@ -410,38 +449,44 @@
         }
 
         .avatar {
-            width: 64px;
-            height: 64px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            margin: 0 auto 12px;
+            margin: 0 auto 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 0.8rem;
             font-weight: 700;
             color: var(--bg-deep);
         }
 
         .roster-card .name {
             font-weight: 600;
-            font-size: 0.95rem;
-            margin-bottom: 4px;
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .roster-card .role {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             color: var(--text-dim);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .roster-card .vote-count {
-            margin-top: 10px;
+            margin-top: 6px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
+            font-size: 1.1rem;
             color: var(--danger);
         }
 
         .roster-card .vote-label {
-            font-size: 0.65rem;
+            font-size: 0.55rem;
             color: var(--text-dim);
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -449,19 +494,39 @@
 
         .remove-btn {
             position: absolute;
-            top: 8px;
-            right: 8px;
+            top: 4px;
+            right: 4px;
             background: none;
             border: none;
             color: var(--text-dim);
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.85rem;
             opacity: 0;
             transition: opacity 0.2s;
         }
 
         .roster-card:hover .remove-btn { opacity: 1; }
         .remove-btn:hover { color: var(--danger); }
+
+        .departed-section {
+            margin-top: 20px;
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+
+        .departed-toggle {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+
+        .departed-toggle:hover { color: var(--danger); }
 
         /* Voting Section */
         .voter-panel {
@@ -1049,7 +1114,12 @@
                 <div class="round-num" id="round-display">Round 1</div>
                 <div class="round-status" id="round-status">Voting is open</div>
             </div>
+            <div class="board-search">
+                <input type="text" id="board-search" placeholder="Search teammates..." oninput="filterBoard()">
+            </div>
+            <div class="board-count" id="board-count"></div>
             <div class="roster-grid" id="roster-grid"></div>
+            <div id="departed-area"></div>
         </div>
 
         <!-- CAST VOTES -->
@@ -1486,10 +1556,25 @@
             `;
         }
 
+        let departedVisible = false;
+
+        function filterBoard() {
+            renderBoard();
+        }
+
+        function toggleDeparted() {
+            departedVisible = !departedVisible;
+            renderBoard();
+        }
+
         function renderBoard() {
             const grid = document.getElementById('roster-grid');
+            const departedArea = document.getElementById('departed-area');
+            const countEl = document.getElementById('board-count');
+            const searchTerm = (document.getElementById('board-search')?.value || '').toLowerCase();
             const roundVotes = data.votes[data.round] || {};
             const activeTeammates = data.teammates.filter(t => !data.departed.includes(t.id));
+            const departedTeammates = data.teammates.filter(t => data.departed.includes(t.id));
 
             document.getElementById('round-display').textContent = `Round ${data.round}`;
             const allVoted = data.voters.length > 0 && Object.keys(roundVotes).length >= data.voters.length;
@@ -1504,6 +1589,8 @@
                         <p>No teammates on the roster yet.</p>
                         <p style="font-size:0.8rem; margin-top:8px;">Head to Admin to add the Edge Impulse crew.</p>
                     </div>`;
+                countEl.textContent = '';
+                departedArea.innerHTML = '';
                 return;
             }
 
@@ -1513,13 +1600,16 @@
                 voteCounts[tid] = (voteCounts[tid] || 0) + 1;
             });
 
-            // Show active first, then departed
-            const sorted = [
-                ...activeTeammates.sort((a, b) => (voteCounts[b.id] || 0) - (voteCounts[a.id] || 0)),
-                ...data.teammates.filter(t => data.departed.includes(t.id))
-            ];
+            // Filter active by search
+            const filteredActive = activeTeammates
+                .filter(t => !searchTerm || t.name.toLowerCase().includes(searchTerm) || t.role.toLowerCase().includes(searchTerm))
+                .sort((a, b) => (voteCounts[b.id] || 0) - (voteCounts[a.id] || 0));
 
-            grid.innerHTML = sorted.map((t, i) => {
+            countEl.textContent = searchTerm
+                ? `${filteredActive.length} of ${activeTeammates.length} active`
+                : `${activeTeammates.length} active \u00b7 ${departedTeammates.length} departed`;
+
+            function renderCard(t) {
                 const isDeparted = data.departed.includes(t.id);
                 const idx = data.teammates.indexOf(t);
                 const votes = voteCounts[t.id] || 0;
@@ -1527,14 +1617,42 @@
                     <div class="roster-card ${isDeparted ? 'departed' : ''}">
                         <button class="remove-btn" onclick="removeTeammate('${t.id}')" title="Remove">&times;</button>
                         <div class="avatar" style="background:${getColor(idx)}">${getInitials(t.name)}</div>
-                        <div class="name">${t.name}</div>
-                        <div class="role">${t.role}</div>
+                        <div class="name" title="${t.name}">${t.name}</div>
+                        <div class="role" title="${t.role}">${t.role}</div>
                         ${!isDeparted && votes > 0 ? `
                             <div class="vote-count">${votes}</div>
                             <div class="vote-label">vote${votes !== 1 ? 's' : ''}</div>
                         ` : ''}
                     </div>`;
-            }).join('');
+            }
+
+            grid.innerHTML = filteredActive.map(renderCard).join('');
+
+            // Departed section (collapsible, hidden by default)
+            if (departedTeammates.length > 0 && !searchTerm) {
+                const filteredDeparted = departedTeammates;
+                departedArea.innerHTML = `
+                    <div class="departed-section">
+                        <button class="departed-toggle" onclick="toggleDeparted()">
+                            ${departedVisible ? '\u25BC' : '\u25B6'} Departed (${filteredDeparted.length})
+                        </button>
+                        ${departedVisible ? `<div class="roster-grid">${filteredDeparted.map(renderCard).join('')}</div>` : ''}
+                    </div>`;
+            } else if (searchTerm) {
+                const matchedDeparted = departedTeammates.filter(t =>
+                    t.name.toLowerCase().includes(searchTerm) || t.role.toLowerCase().includes(searchTerm));
+                if (matchedDeparted.length > 0) {
+                    departedArea.innerHTML = `
+                        <div class="departed-section">
+                            <button class="departed-toggle" style="color:var(--danger)">Departed matches (${matchedDeparted.length})</button>
+                            <div class="roster-grid">${matchedDeparted.map(renderCard).join('')}</div>
+                        </div>`;
+                } else {
+                    departedArea.innerHTML = '';
+                }
+            } else {
+                departedArea.innerHTML = '';
+            }
         }
 
         function renderVoters() {
