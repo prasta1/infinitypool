@@ -34,6 +34,200 @@
             overflow-x: hidden;
         }
 
+        /* Lock Screen */
+        .lock-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--pool-gradient);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .lock-screen::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 30% 50%, rgba(0, 212, 255, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 30%, rgba(123, 47, 247, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .lock-screen.hidden { display: none; }
+
+        .lock-box {
+            position: relative;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .lock-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 4px;
+            margin-bottom: 6px;
+        }
+
+        .lock-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+        }
+
+        .lock-icon {
+            font-size: 3rem;
+            margin-bottom: 24px;
+            opacity: 0.6;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .lock-prompt {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .key-input-wrapper {
+            position: relative;
+        }
+
+        .key-input {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-bright);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            text-align: center;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        .key-input::placeholder {
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .key-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+        }
+
+        .key-input.error {
+            border-color: var(--danger);
+            animation: shake 0.4s ease;
+        }
+
+        .key-input.success {
+            border-color: var(--success);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.15);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+        }
+
+        .lock-enter-btn {
+            width: 100%;
+            margin-top: 14px;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            color: var(--bg-deep);
+        }
+
+        .lock-enter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px var(--accent-glow);
+        }
+
+        .lock-error-msg {
+            margin-top: 14px;
+            font-size: 0.8rem;
+            color: var(--danger);
+            min-height: 20px;
+        }
+
+        .lock-footer {
+            margin-top: 40px;
+            font-size: 0.7rem;
+            color: rgba(136, 136, 136, 0.4);
+            letter-spacing: 1px;
+        }
+
+        /* Logged-in user bar */
+        .user-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            margin-bottom: -10px;
+        }
+
+        .user-bar .user-badge {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .user-bar .user-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+            display: inline-block;
+        }
+
+        .user-bar .logout-btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-bar .logout-btn:hover {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
         /* Water ripple background effect */
         body::before {
             content: '';
@@ -685,7 +879,28 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Lock Screen -->
+    <div class="lock-screen" id="lock-screen">
+        <div class="lock-box">
+            <div class="lock-logo">&#x221E; INFINITY POOL</div>
+            <div class="lock-subtitle">Authorized Access Only</div>
+            <div class="lock-icon">&#x1F512;</div>
+            <div class="lock-prompt">Enter your access key</div>
+            <div class="key-input-wrapper">
+                <input type="password" class="key-input" id="key-input"
+                       placeholder="EDGE-XXXXX-XXXX" autocomplete="off" spellcheck="false">
+            </div>
+            <button class="lock-enter-btn" onclick="attemptUnlock()">ENTER THE POOL</button>
+            <div class="lock-error-msg" id="lock-error"></div>
+            <div class="lock-footer">Invitation only &bull; Edge Impulse</div>
+        </div>
+    </div>
+
+    <div class="container" id="app-container" style="display:none;">
+        <div class="user-bar">
+            <span class="user-badge"><span class="dot"></span> <span id="session-user"></span></span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
         <header>
             <div class="logo">
                 <span class="pool-icon">&#x221E;</span> INFINITY POOL
@@ -802,6 +1017,85 @@
     <div class="confetti-container" id="confetti-container"></div>
 
     <script>
+        // ─── Access Control ──────────────────────────────
+        const ACCESS_KEYS = {
+            '958ed8ae6ebf1644af40fb0605cee4b33007d12a28d612fa65ea76ae2cd2d032': 'Holder 1',
+            '599cde5963b87cec0b338d20ef5985f20575fb0331ba172de61047680eed2d76': 'Holder 2',
+            '95c41d0c0d71d6591c55ed3dba9a1db4d532b00806a11c0bd594696efd1d1850': 'Holder 3',
+            '18ea58f6f2d25731848e3f8b8fb99e3e88495a181621a79c910c44b5d76ed03e': 'Holder 4',
+        };
+
+        const SESSION_KEY = 'infinity_pool_session';
+
+        async function sha256(str) {
+            const buf = await crypto.subtle.digest('SHA-256',
+                new TextEncoder().encode(str));
+            return Array.from(new Uint8Array(buf))
+                .map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function attemptUnlock() {
+            const input = document.getElementById('key-input');
+            const errorEl = document.getElementById('lock-error');
+            const raw = input.value.trim().toUpperCase();
+
+            if (!raw) {
+                errorEl.textContent = 'Enter your access key.';
+                input.classList.add('error');
+                setTimeout(() => input.classList.remove('error'), 500);
+                return;
+            }
+
+            const hash = await sha256(raw);
+
+            if (ACCESS_KEYS[hash]) {
+                input.classList.add('success');
+                errorEl.textContent = '';
+                const name = ACCESS_KEYS[hash];
+                sessionStorage.setItem(SESSION_KEY, JSON.stringify({ hash, name }));
+                setTimeout(() => unlockApp(name), 400);
+            } else {
+                errorEl.textContent = 'Invalid access key. This attempt has been noted.';
+                input.classList.add('error');
+                input.value = '';
+                setTimeout(() => input.classList.remove('error'), 500);
+            }
+        }
+
+        function unlockApp(userName) {
+            document.getElementById('lock-screen').classList.add('hidden');
+            document.getElementById('app-container').style.display = '';
+            document.getElementById('session-user').textContent = userName;
+            render();
+        }
+
+        function logout() {
+            sessionStorage.removeItem(SESSION_KEY);
+            document.getElementById('lock-screen').classList.remove('hidden');
+            document.getElementById('app-container').style.display = 'none';
+            document.getElementById('key-input').value = '';
+            document.getElementById('key-input').classList.remove('success');
+            document.getElementById('lock-error').textContent = '';
+        }
+
+        // Check for existing session
+        (function checkSession() {
+            const session = sessionStorage.getItem(SESSION_KEY);
+            if (session) {
+                try {
+                    const { hash, name } = JSON.parse(session);
+                    if (ACCESS_KEYS[hash]) {
+                        unlockApp(name);
+                        return;
+                    }
+                } catch(e) {}
+            }
+            // Stay on lock screen
+            document.getElementById('key-input').addEventListener('keydown', e => {
+                if (e.key === 'Enter') attemptUnlock();
+            });
+        })();
+
         // ─── Data Layer ──────────────────────────────────
         const STORAGE_KEY = 'infinity_pool_data';
 
