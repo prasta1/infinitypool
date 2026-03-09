@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinity Pool - Edge Impulse</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-deep: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-hover: #1a1a2e;
+            --border: #2a2a3e;
+            --accent: #00d4ff;
+            --accent-glow: rgba(0, 212, 255, 0.3);
+            --accent-secondary: #7b2ff7;
+            --danger: #ff3366;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --text: #e0e0e0;
+            --text-dim: #888;
+            --text-bright: #ffffff;
+            --pool-gradient: linear-gradient(135deg, #0a0a0f 0%, #0d1b2a 50%, #1b2838 100%);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--pool-gradient);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Water ripple background effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(0, 212, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(123, 47, 247, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(0, 212, 255, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 40px 0 30px;
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: none;
+            letter-spacing: 4px;
+            margin-bottom: 8px;
+        }
+
+        .logo .pool-icon {
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .subtitle span {
+            color: var(--accent);
+        }
+
+        /* Navigation Tabs */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            font-family: 'Inter', sans-serif;
+            padding: 10px 24px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-dim);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(123, 47, 247, 0.15));
+            border-color: var(--accent);
+            color: var(--text-bright);
+        }
+
+        /* Sections */
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 212, 255, 0.3);
+            background: var(--bg-card-hover);
+        }
+
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--accent);
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+        }
+
+        /* Roster Grid */
+        .roster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .roster-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .roster-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.1);
+        }
+
+        .roster-card.departed {
+            border-color: var(--danger);
+            opacity: 0.6;
+        }
+
+        .roster-card.departed::after {
+            content: 'DEPARTED';
+            position: absolute;
+            top: 12px;
+            right: -30px;
+            background: var(--danger);
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 2px 35px;
+            transform: rotate(45deg);
+            letter-spacing: 1px;
+        }
+
+        .avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--bg-deep);
+        }
+
+        .roster-card .name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .roster-card .role {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .roster-card .vote-count {
+            margin-top: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--danger);
+        }
+
+        .roster-card .vote-label {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 1rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .roster-card:hover .remove-btn { opacity: 1; }
+        .remove-btn:hover { color: var(--danger); }
+
+        /* Voting Section */
+        .voter-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .voter-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .voter-card.has-voted {
+            border-color: var(--success);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.05);
+        }
+
+        .voter-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .voter-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--bg-deep);
+            flex-shrink: 0;
+        }
+
+        .voter-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .voter-score {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            color: var(--warning);
+        }
+
+        .vote-select {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-deep);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+
+        .vote-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .vote-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            color: var(--bg-deep);
+        }
+
+        .vote-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .vote-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .current-pick {
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .current-pick strong {
+            color: var(--success);
+        }
+
+        /* Leaderboard */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .leaderboard-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(42, 42, 62, 0.5);
+            font-size: 0.9rem;
+        }
+
+        .leaderboard-table tr:hover td {
+            background: rgba(0, 212, 255, 0.03);
+        }
+
+        .rank { font-family: 'Orbitron', sans-serif; font-weight: 700; }
+        .rank-1 { color: #ffd700; }
+        .rank-2 { color: #c0c0c0; }
+        .rank-3 { color: #cd7f32; }
+
+        .score-badge {
+            font-family: 'Orbitron', sans-serif;
+            background: rgba(255, 170, 0, 0.1);
+            color: var(--warning);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        /* History / Log */
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border-bottom: 1px solid rgba(42, 42, 62, 0.5);
+        }
+
+        .history-date {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            min-width: 90px;
+        }
+
+        .history-text {
+            font-size: 0.85rem;
+            flex: 1;
+        }
+
+        .history-text .departed-name {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .history-text .winner-name {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* Admin Controls */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-deep);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            color: var(--bg-deep);
+        }
+
+        .btn-danger {
+            background: rgba(255, 51, 102, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(255, 51, 102, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 51, 102, 0.25);
+        }
+
+        .btn-success {
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .mark-departed-section {
+            margin-top: 16px;
+        }
+
+        .mark-departed-section select {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-deep);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin: 24px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 2px;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+            animation-fill-mode: forwards;
+        }
+
+        .toast-success {
+            background: rgba(0, 255, 136, 0.15);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: var(--success);
+        }
+
+        .toast-info {
+            background: rgba(0, 212, 255, 0.15);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: var(--accent);
+        }
+
+        .toast-error {
+            background: rgba(255, 51, 102, 0.15);
+            border: 1px solid rgba(255, 51, 102, 0.3);
+            color: var(--danger);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateY(10px); }
+        }
+
+        /* Round indicator */
+        .round-banner {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 14px;
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 10px;
+        }
+
+        .round-banner .round-num {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+
+        .round-banner .round-status {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-dim);
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        /* Confetti container */
+        .confetti-container {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            top: -10px;
+            animation: confetti-fall 3s ease-in forwards;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .logo { font-size: 2rem; }
+            .container { padding: 12px; }
+            .voter-panel { grid-template-columns: 1fr; }
+            .stats-bar { gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="pool-icon">&#x221E;</span> INFINITY POOL
+            </div>
+            <div class="subtitle">Edge Impulse <span>&#x2022;</span> Who's Next?</div>
+        </header>
+
+        <div class="stats-bar" id="stats-bar"></div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('board')">The Board</button>
+            <button class="tab-btn" onclick="showTab('vote')">Cast Votes</button>
+            <button class="tab-btn" onclick="showTab('leaderboard')">Leaderboard</button>
+            <button class="tab-btn" onclick="showTab('history')">History</button>
+            <button class="tab-btn" onclick="showTab('admin')">Admin</button>
+        </div>
+
+        <!-- THE BOARD -->
+        <div class="section active" id="section-board">
+            <div class="round-banner">
+                <div class="round-num" id="round-display">Round 1</div>
+                <div class="round-status" id="round-status">Voting is open</div>
+            </div>
+            <div class="roster-grid" id="roster-grid"></div>
+        </div>
+
+        <!-- CAST VOTES -->
+        <div class="section" id="section-vote">
+            <div class="round-banner">
+                <div class="round-num" id="vote-round-display">Round 1</div>
+                <div class="round-status">Select your pick below</div>
+            </div>
+            <div class="voter-panel" id="voter-panel"></div>
+        </div>
+
+        <!-- LEADERBOARD -->
+        <div class="section" id="section-leaderboard">
+            <div class="card">
+                <div class="card-title">Voter Rankings</div>
+                <table class="leaderboard-table" id="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Voter</th>
+                            <th>Correct Picks</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- HISTORY -->
+        <div class="section" id="section-history">
+            <div class="card">
+                <div class="card-title">Departure Log</div>
+                <div id="history-list"></div>
+            </div>
+        </div>
+
+        <!-- ADMIN -->
+        <div class="section" id="section-admin">
+            <div class="admin-grid">
+                <div class="card">
+                    <div class="card-title">Add Teammate</div>
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input class="form-input" id="new-name" placeholder="e.g. Jan Jongboom">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Role</label>
+                        <input class="form-input" id="new-role" placeholder="e.g. CTO">
+                    </div>
+                    <button class="btn btn-primary" onclick="addTeammate()">Add to Roster</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Record Departure</div>
+                    <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:12px;">
+                        When someone actually leaves, record it here. Correct predictions earn points.
+                    </p>
+                    <div class="mark-departed-section">
+                        <select id="departed-select"></select>
+                        <button class="btn btn-danger" onclick="markDeparted()">Mark as Departed</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Manage Voters</div>
+                    <div class="form-group">
+                        <label class="form-label">Voter Name</label>
+                        <input class="form-input" id="new-voter" placeholder="e.g. Alice">
+                    </div>
+                    <button class="btn btn-primary" onclick="addVoter()" id="add-voter-btn">Add Voter</button>
+                    <div id="voter-list" style="margin-top: 14px;"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">New Round</div>
+                    <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:12px;">
+                        Start a new prediction round. All current votes reset.
+                    </p>
+                    <button class="btn btn-success" onclick="newRound()">Start New Round</button>
+                    <div style="margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+                        <div class="card-title" style="color: var(--danger);">Danger Zone</div>
+                        <button class="btn btn-danger" onclick="resetAll()">Reset Everything</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="confetti-container" id="confetti-container"></div>
+
+    <script>
+        // ─── Data Layer ──────────────────────────────────
+        const STORAGE_KEY = 'infinity_pool_data';
+
+        const AVATAR_COLORS = [
+            '#00d4ff', '#7b2ff7', '#ff3366', '#00ff88',
+            '#ffaa00', '#ff6b35', '#845ec2', '#2ec4b6',
+            '#e71d36', '#ff9a00', '#0ead69', '#4361ee'
+        ];
+
+        function defaultData() {
+            return {
+                teammates: [],
+                voters: [],
+                votes: {},       // { round: { voterId: teammateId } }
+                round: 1,
+                history: [],     // { date, departedName, correctVoters[] }
+                departed: [],    // teammate IDs
+            };
+        }
+
+        function loadData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) return JSON.parse(raw);
+            } catch(e) {}
+            return defaultData();
+        }
+
+        function saveData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        let data = loadData();
+
+        // ─── Helpers ─────────────────────────────────────
+        function getInitials(name) {
+            return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        function getColor(index) {
+            return AVATAR_COLORS[index % AVATAR_COLORS.length];
+        }
+
+        function genId() {
+            return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        }
+
+        function showToast(msg, type = 'info') {
+            const el = document.createElement('div');
+            el.className = `toast toast-${type}`;
+            el.textContent = msg;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 3200);
+        }
+
+        function fireConfetti() {
+            const container = document.getElementById('confetti-container');
+            const colors = ['#00d4ff', '#7b2ff7', '#ff3366', '#00ff88', '#ffaa00', '#ffd700'];
+            for (let i = 0; i < 60; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.left = Math.random() * 100 + '%';
+                c.style.background = colors[Math.floor(Math.random() * colors.length)];
+                c.style.animationDelay = Math.random() * 1.5 + 's';
+                c.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                c.style.width = (4 + Math.random() * 8) + 'px';
+                c.style.height = (4 + Math.random() * 8) + 'px';
+                container.appendChild(c);
+            }
+            setTimeout(() => { container.innerHTML = ''; }, 4000);
+        }
+
+        // ─── Tab Navigation ──────────────────────────────
+        function showTab(tab) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`section-${tab}`).classList.add('active');
+            event.target.classList.add('active');
+            render();
+        }
+
+        // ─── Rendering ──────────────────────────────────
+        function render() {
+            renderStats();
+            renderBoard();
+            renderVoters();
+            renderLeaderboard();
+            renderHistory();
+            renderAdmin();
+        }
+
+        function renderStats() {
+            const active = data.teammates.filter(t => !data.departed.includes(t.id)).length;
+            const departed = data.departed.length;
+            const totalVotes = Object.values(data.votes[data.round] || {}).length;
+
+            document.getElementById('stats-bar').innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value">${active}</div>
+                    <div class="stat-label">Active</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${departed}</div>
+                    <div class="stat-label">Departed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${totalVotes}/${data.voters.length}</div>
+                    <div class="stat-label">Votes Cast</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${data.round}</div>
+                    <div class="stat-label">Round</div>
+                </div>
+            `;
+        }
+
+        function renderBoard() {
+            const grid = document.getElementById('roster-grid');
+            const roundVotes = data.votes[data.round] || {};
+            const activeTeammates = data.teammates.filter(t => !data.departed.includes(t.id));
+
+            document.getElementById('round-display').textContent = `Round ${data.round}`;
+            const allVoted = data.voters.length > 0 && Object.keys(roundVotes).length >= data.voters.length;
+            document.getElementById('round-status').textContent = allVoted
+                ? 'All votes are in!'
+                : `${Object.keys(roundVotes).length} of ${data.voters.length} votes cast`;
+
+            if (data.teammates.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="icon">&#x1F3CA;</div>
+                        <p>No teammates on the roster yet.</p>
+                        <p style="font-size:0.8rem; margin-top:8px;">Head to Admin to add the Edge Impulse crew.</p>
+                    </div>`;
+                return;
+            }
+
+            // Count votes per teammate
+            const voteCounts = {};
+            Object.values(roundVotes).forEach(tid => {
+                voteCounts[tid] = (voteCounts[tid] || 0) + 1;
+            });
+
+            // Show active first, then departed
+            const sorted = [
+                ...activeTeammates.sort((a, b) => (voteCounts[b.id] || 0) - (voteCounts[a.id] || 0)),
+                ...data.teammates.filter(t => data.departed.includes(t.id))
+            ];
+
+            grid.innerHTML = sorted.map((t, i) => {
+                const isDeparted = data.departed.includes(t.id);
+                const idx = data.teammates.indexOf(t);
+                const votes = voteCounts[t.id] || 0;
+                return `
+                    <div class="roster-card ${isDeparted ? 'departed' : ''}">
+                        <button class="remove-btn" onclick="removeTeammate('${t.id}')" title="Remove">&times;</button>
+                        <div class="avatar" style="background:${getColor(idx)}">${getInitials(t.name)}</div>
+                        <div class="name">${t.name}</div>
+                        <div class="role">${t.role}</div>
+                        ${!isDeparted && votes > 0 ? `
+                            <div class="vote-count">${votes}</div>
+                            <div class="vote-label">vote${votes !== 1 ? 's' : ''}</div>
+                        ` : ''}
+                    </div>`;
+            }).join('');
+        }
+
+        function renderVoters() {
+            const panel = document.getElementById('voter-panel');
+            const roundVotes = data.votes[data.round] || {};
+            const activeTeammates = data.teammates.filter(t => !data.departed.includes(t.id));
+
+            document.getElementById('vote-round-display').textContent = `Round ${data.round}`;
+
+            if (data.voters.length === 0) {
+                panel.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="icon">&#x1F5F3;</div>
+                        <p>No voters registered yet.</p>
+                        <p style="font-size:0.8rem; margin-top:8px;">Add voters in the Admin panel.</p>
+                    </div>`;
+                return;
+            }
+
+            panel.innerHTML = data.voters.map((v, i) => {
+                const currentVote = roundVotes[v.id];
+                const picked = currentVote ? data.teammates.find(t => t.id === currentVote) : null;
+
+                return `
+                    <div class="voter-card ${picked ? 'has-voted' : ''}">
+                        <div class="voter-header">
+                            <div class="voter-avatar" style="background:${getColor(i + 4)}">${getInitials(v.name)}</div>
+                            <div>
+                                <div class="voter-name">${v.name}</div>
+                                <div class="voter-score">${v.score || 0} pts</div>
+                            </div>
+                        </div>
+                        <select class="vote-select" id="vote-sel-${v.id}">
+                            <option value="">-- Pick who's next --</option>
+                            ${activeTeammates.map(t => `
+                                <option value="${t.id}" ${currentVote === t.id ? 'selected' : ''}>${t.name} (${t.role})</option>
+                            `).join('')}
+                        </select>
+                        <button class="vote-btn" onclick="castVote('${v.id}')">
+                            ${picked ? 'Change Vote' : 'Lock It In'}
+                        </button>
+                        ${picked ? `
+                            <div class="current-pick">
+                                Current pick: <strong>${picked.name}</strong>
+                            </div>` : ''}
+                    </div>`;
+            }).join('');
+        }
+
+        function renderLeaderboard() {
+            const body = document.getElementById('leaderboard-body');
+            const sorted = [...data.voters].sort((a, b) => (b.score || 0) - (a.score || 0));
+
+            body.innerHTML = sorted.map((v, i) => {
+                const rankClass = i < 3 ? `rank-${i + 1}` : '';
+                const medals = ['&#x1F947;', '&#x1F948;', '&#x1F949;'];
+                return `
+                    <tr>
+                        <td class="rank ${rankClass}">${i < 3 ? medals[i] : i + 1}</td>
+                        <td>${v.name}</td>
+                        <td>${v.correctPicks || 0}</td>
+                        <td><span class="score-badge">${v.score || 0}</span></td>
+                    </tr>`;
+            }).join('');
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            if (data.history.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">&#x1F4DC;</div>
+                        <p>No departures recorded yet.</p>
+                    </div>`;
+                return;
+            }
+
+            list.innerHTML = data.history.slice().reverse().map(h => `
+                <div class="history-item">
+                    <div class="history-date">${h.date}</div>
+                    <div class="history-text">
+                        <span class="departed-name">${h.departedName}</span> left the nest.
+                        ${h.correctVoters.length > 0
+                            ? `Called it: <span class="winner-name">${h.correctVoters.join(', ')}</span>`
+                            : '<span style="color:var(--text-dim)">Nobody saw it coming.</span>'}
+                        <span style="color:var(--text-dim); font-size:0.75rem;">(Round ${h.round})</span>
+                    </div>
+                </div>`).join('');
+        }
+
+        function renderAdmin() {
+            // Departed select
+            const sel = document.getElementById('departed-select');
+            const activeTeammates = data.teammates.filter(t => !data.departed.includes(t.id));
+            sel.innerHTML = `<option value="">-- Select who departed --</option>` +
+                activeTeammates.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+
+            // Voter list
+            const vl = document.getElementById('voter-list');
+            vl.innerHTML = data.voters.map(v => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border);">
+                    <span style="font-size:0.85rem;">${v.name}</span>
+                    <button class="btn btn-danger" style="padding:4px 10px; font-size:0.75rem;" onclick="removeVoter('${v.id}')">Remove</button>
+                </div>`).join('');
+
+            // Disable add voter if already 4
+            const btn = document.getElementById('add-voter-btn');
+            if (data.voters.length >= 4) {
+                btn.disabled = true;
+                btn.textContent = 'Max 4 Voters';
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'Add Voter';
+            }
+        }
+
+        // ─── Actions ─────────────────────────────────────
+        function addTeammate() {
+            const name = document.getElementById('new-name').value.trim();
+            const role = document.getElementById('new-role').value.trim();
+            if (!name) return showToast('Enter a name', 'error');
+
+            data.teammates.push({ id: genId(), name, role: role || 'Team Member' });
+            saveData(data);
+            document.getElementById('new-name').value = '';
+            document.getElementById('new-role').value = '';
+            render();
+            showToast(`${name} added to the roster`, 'success');
+        }
+
+        function removeTeammate(id) {
+            const t = data.teammates.find(t => t.id === id);
+            if (!confirm(`Remove ${t.name} from the roster entirely?`)) return;
+            data.teammates = data.teammates.filter(t => t.id !== id);
+            data.departed = data.departed.filter(d => d !== id);
+            // Clean votes
+            Object.keys(data.votes).forEach(round => {
+                Object.keys(data.votes[round]).forEach(vid => {
+                    if (data.votes[round][vid] === id) delete data.votes[round][vid];
+                });
+            });
+            saveData(data);
+            render();
+            showToast(`${t.name} removed`, 'info');
+        }
+
+        function addVoter() {
+            if (data.voters.length >= 4) return showToast('Maximum 4 voters allowed', 'error');
+            const name = document.getElementById('new-voter').value.trim();
+            if (!name) return showToast('Enter a name', 'error');
+
+            data.voters.push({ id: genId(), name, score: 0, correctPicks: 0 });
+            saveData(data);
+            document.getElementById('new-voter').value = '';
+            render();
+            showToast(`${name} can now vote`, 'success');
+        }
+
+        function removeVoter(id) {
+            const v = data.voters.find(v => v.id === id);
+            if (!confirm(`Remove voter ${v.name}?`)) return;
+            data.voters = data.voters.filter(v => v.id !== id);
+            Object.keys(data.votes).forEach(round => {
+                delete data.votes[round][id];
+            });
+            saveData(data);
+            render();
+            showToast(`${v.name} removed from voters`, 'info');
+        }
+
+        function castVote(voterId) {
+            const sel = document.getElementById(`vote-sel-${voterId}`);
+            const teammateId = sel.value;
+            if (!teammateId) return showToast('Pick someone first!', 'error');
+
+            if (!data.votes[data.round]) data.votes[data.round] = {};
+            data.votes[data.round][voterId] = teammateId;
+            saveData(data);
+
+            const voter = data.voters.find(v => v.id === voterId);
+            const teammate = data.teammates.find(t => t.id === teammateId);
+            render();
+            showToast(`${voter.name} locked in: ${teammate.name}`, 'success');
+        }
+
+        function markDeparted() {
+            const sel = document.getElementById('departed-select');
+            const id = sel.value;
+            if (!id) return showToast('Select who departed', 'error');
+
+            const teammate = data.teammates.find(t => t.id === id);
+            if (!confirm(`Confirm: ${teammate.name} has left Edge Impulse?`)) return;
+
+            data.departed.push(id);
+
+            // Check who predicted correctly this round
+            const roundVotes = data.votes[data.round] || {};
+            const correctVoters = [];
+            Object.entries(roundVotes).forEach(([voterId, pickedId]) => {
+                if (pickedId === id) {
+                    const voter = data.voters.find(v => v.id === voterId);
+                    if (voter) {
+                        voter.score = (voter.score || 0) + 10;
+                        voter.correctPicks = (voter.correctPicks || 0) + 1;
+                        correctVoters.push(voter.name);
+                    }
+                }
+            });
+
+            data.history.push({
+                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                departedName: teammate.name,
+                departedRole: teammate.role,
+                correctVoters,
+                round: data.round
+            });
+
+            saveData(data);
+            render();
+
+            if (correctVoters.length > 0) {
+                fireConfetti();
+                showToast(`${correctVoters.join(' & ')} called it! +10 pts`, 'success');
+            } else {
+                showToast(`${teammate.name} departed. Nobody predicted it!`, 'info');
+            }
+        }
+
+        function newRound() {
+            if (!confirm('Start a new round? Current votes will be locked in history.')) return;
+            data.round++;
+            data.votes[data.round] = {};
+            saveData(data);
+            render();
+            showToast(`Round ${data.round} has begun!`, 'success');
+        }
+
+        function resetAll() {
+            if (!confirm('This will erase ALL data. Are you sure?')) return;
+            if (!confirm('Really? Everything goes away.')) return;
+            localStorage.removeItem(STORAGE_KEY);
+            data = defaultData();
+            render();
+            showToast('Everything has been reset', 'info');
+        }
+
+        // Allow Enter key in forms
+        document.getElementById('new-name').addEventListener('keydown', e => {
+            if (e.key === 'Enter') { e.preventDefault(); document.getElementById('new-role').focus(); }
+        });
+        document.getElementById('new-role').addEventListener('keydown', e => {
+            if (e.key === 'Enter') { e.preventDefault(); addTeammate(); }
+        });
+        document.getElementById('new-voter').addEventListener('keydown', e => {
+            if (e.key === 'Enter') { e.preventDefault(); addVoter(); }
+        });
+
+        // ─── Initial Render ──────────────────────────────
+        render();
+    </script>
+</body>
+</html>
