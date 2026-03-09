@@ -30,10 +30,10 @@ The site requires one of four unique keys to enter:
 
 | Key                | Holder   |
 |--------------------|----------|
-| `EDGE-NEPTUNE-7741` | Holder 1 |
-| `EDGE-PHANTOM-3382` | Holder 2 |
-| `EDGE-VORTEX-9154`  | Holder 3 |
-| `EDGE-CIPHER-6628`  | Holder 4 |
+| `EDGE-KRAKEN-9322`  | Holder 1 |
+| `EDGE-SPECTER-9164` | Holder 2 |
+| `EDGE-TORRENT-9500` | Holder 3 |
+| `EDGE-MIRAGE-6813`  | Holder 4 |
 
 Keys are verified client-side against SHA-256 hashes. Sessions persist per tab.
 
