@@ -1337,9 +1337,37 @@
             '#e71d36', '#ff9a00', '#0ead69', '#4361ee'
         ];
 
+        const DEFAULT_ROSTER = [
+            'Abi Ghali', 'Adam Benzion', 'Adam Wireman-Sobba', 'Albert Ko',
+            'Alessandro Grande', 'Alex Elium', 'Alexis Susset', 'Angelos Petheriotis',
+            'Arjan Kamphuis', 'Ashvin Roharia', 'Aurelien Lequertier', 'Brandon Shibley',
+            'Brennan Dayberry', 'Brian Elmore', 'Brian McFadden', 'Bryan D\'Andrea',
+            'Carl Ward', 'Christian Filonow', 'Christine Bertsch', 'Christine Poon',
+            'Daniel Situnayake', 'David Tischler', 'Dervla Walsh', 'Dipti Dabholkar',
+            'Dmitry Maslov', 'Elion Zogjani', 'Eoin Jordan', 'Fernando Jiménez Moreno',
+            'Francesco Varani', 'Gledé Kabongo', 'Harry Mostyn', 'Heath Blandford',
+            'Ivan Boskovic', 'Ivan Turasov', 'Jame Ervin', 'James Cockshull',
+            'Jan Jongboom', 'Jelle Bot', 'Jenny Speelman', 'Jim Bruges',
+            'Jodie Lane', 'Jonathan Stember', 'Josh Waite', 'Joshua Buck',
+            'Keelin Murphy', 'Kinara Pandya', 'Linda Watkins', 'Louis Moreau',
+            'Maggi Yang', 'Manny Singh', 'Marc Pous', 'Marco Levrero',
+            'Marissa Gialopsos', 'Mark Waters', 'Mat Kelcey', 'Mateusz Majchrzycki',
+            'Mathijs Baaijens', 'Michael Beavis', 'Mike Senese', 'Moe Sani',
+            'Muhammad Zafar Sheikh', 'Murray Shaw', 'Nabil Koroghl', 'Natalie Mullin',
+            'Ninna Nuppulinna', 'Niti Paudyal', 'Paige Holvik', 'Patrick Ruster',
+            'Paul Fagarasan', 'Phil Selander', 'Raul James', 'Ricky Kassab',
+            'RJ Vissers', 'Ronald Berry', 'Ross Lowe', 'Sally Atkinson',
+            'Salman Hafeez', 'Sander Van Hulst', 'Sara Olsson', 'Scott Ferguson',
+            'Sergi Mansilla', 'Shams Mansoor', 'Simon Issakov', 'Sophia Zimmermann',
+            'Spencer Huang', 'Steve Solari', 'Taruna Emani', 'Teague Gudemann',
+            'Tina Mathe', 'Tony Loughnane', 'Tuulikki Laitinen', 'Tyler Hrycak',
+            'Vojislav Milivojevic', 'Wesley Davis', 'William DeLey', 'Yan Li',
+            'Yana Vibe', 'Zach Shelby', 'Zin Kyaw',
+        ];
+
         function defaultData() {
             return {
-                teammates: [],
+                teammates: DEFAULT_ROSTER.map(name => ({ id: genId(), name, role: 'Team Member' })),
                 voters: [],
                 votes: {},       // { round: { voterId: teammateId } }
                 round: 1,
@@ -1351,7 +1379,15 @@
         function loadData() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) return JSON.parse(raw);
+                if (raw) {
+                    const d = JSON.parse(raw);
+                    // Seed roster if existing data has no teammates
+                    if (d.teammates && d.teammates.length === 0) {
+                        d.teammates = DEFAULT_ROSTER.map(name => ({ id: genId(), name, role: 'Team Member' }));
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+                    }
+                    return d;
+                }
             } catch(e) {}
             return defaultData();
         }
