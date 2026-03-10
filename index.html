@@ -367,154 +367,218 @@
         }
 
         /* Roster Grid */
-        .board-search {
+        /* Battle Royale Arena */
+        .arena-controls {
+            display: flex;
+            gap: 12px;
             margin-bottom: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .arena-search {
+            flex: 1;
+            min-width: 180px;
             position: relative;
         }
 
-        .board-search input {
+        .arena-search input {
             width: 100%;
-            padding: 10px 16px 10px 40px;
+            padding: 8px 12px 8px 32px;
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 8px;
             color: var(--text);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             outline: none;
             transition: border-color 0.3s;
         }
 
-        .board-search input:focus {
-            border-color: var(--accent);
-        }
+        .arena-search input:focus { border-color: var(--accent); }
 
-        .board-search::before {
+        .arena-search::before {
             content: '\1F50D';
             position: absolute;
-            left: 12px;
+            left: 10px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             opacity: 0.5;
         }
 
-        .board-count {
-            font-size: 0.75rem;
+        .arena-legend {
+            display: flex;
+            gap: 12px;
+            font-size: 0.65rem;
             color: var(--text-dim);
-            margin-bottom: 12px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
         }
 
-        .roster-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        .roster-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px 10px;
-            text-align: center;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .roster-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--accent);
-            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
-        }
-
-        .roster-card.departed {
-            border-color: var(--danger);
-            opacity: 0.5;
-        }
-
-        .roster-card.departed::after {
-            content: 'DEPARTED';
-            position: absolute;
-            top: 8px;
-            right: -32px;
-            background: var(--danger);
-            color: white;
-            font-size: 0.5rem;
-            font-weight: 700;
-            padding: 2px 35px;
-            transform: rotate(45deg);
-            letter-spacing: 1px;
-        }
-
-        .avatar {
-            width: 36px;
-            height: 36px;
+        .legend-dot {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            margin: 0 auto 8px;
+        }
+
+        .arena-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .arena-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle,
+                rgba(255, 51, 102, 0.12) 0%,
+                rgba(255, 51, 102, 0.06) 15%,
+                rgba(255, 170, 0, 0.04) 30%,
+                rgba(0, 212, 255, 0.02) 55%,
+                transparent 80%
+            );
+            border: 2px solid rgba(0, 212, 255, 0.15);
+            box-shadow:
+                0 0 60px rgba(0, 212, 255, 0.04),
+                inset 0 0 80px rgba(255, 51, 102, 0.03);
+        }
+
+        .arena-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px dashed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .arena-ring.danger {
+            width: 30%;
+            height: 30%;
+            border-color: rgba(255, 51, 102, 0.25);
+            box-shadow: inset 0 0 30px rgba(255, 51, 102, 0.08);
+        }
+
+        .arena-ring.caution {
+            width: 55%;
+            height: 55%;
+            border-color: rgba(255, 170, 0, 0.15);
+        }
+
+        .arena-ring.safe {
+            width: 80%;
+            height: 80%;
+            border-color: rgba(0, 212, 255, 0.1);
+        }
+
+        .arena-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .arena-center .skull {
+            font-size: 1.5rem;
+            animation: arenaPulse 2s ease-in-out infinite;
+        }
+
+        .arena-center .zone-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.45rem;
+            color: var(--danger);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        @keyframes arenaPulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        .arena-person {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
+            font-size: 0.4rem;
             font-weight: 700;
             color: var(--bg-deep);
+            cursor: default;
+            transition: transform 0.2s, z-index 0s;
+            z-index: 2;
+            transform: translate(-50%, -50%);
+            border: 1.5px solid rgba(0,0,0,0.2);
         }
 
-        .roster-card .name {
-            font-weight: 600;
-            font-size: 0.8rem;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .arena-person:hover {
+            transform: translate(-50%, -50%) scale(1.8);
+            z-index: 10;
+            box-shadow: 0 0 14px rgba(0, 212, 255, 0.5);
         }
 
-        .roster-card .role {
-            font-size: 0.65rem;
-            color: var(--text-dim);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .roster-card .vote-count {
-            margin-top: 6px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            color: var(--danger);
-        }
-
-        .roster-card .vote-label {
-            font-size: 0.55rem;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .remove-btn {
+        .arena-person .person-tooltip {
+            display: none;
             position: absolute;
-            top: 4px;
-            right: 4px;
-            background: none;
-            border: none;
-            color: var(--text-dim);
-            cursor: pointer;
-            font-size: 0.85rem;
-            opacity: 0;
-            transition: opacity 0.2s;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 10px;
+            white-space: nowrap;
+            font-size: 0.7rem;
+            color: var(--text);
+            font-weight: 400;
+            pointer-events: none;
+            z-index: 20;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
 
-        .roster-card:hover .remove-btn { opacity: 1; }
-        .remove-btn:hover { color: var(--danger); }
+        .arena-person:hover .person-tooltip { display: block; }
 
-        .departed-section {
+        .arena-person.voted {
+            animation: votedGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes votedGlow {
+            0%, 100% { box-shadow: 0 0 3px rgba(255, 51, 102, 0.3); }
+            50% { box-shadow: 0 0 10px rgba(255, 51, 102, 0.6); }
+        }
+
+        .arena-count {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-align: center;
+            margin-top: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .graveyard {
             margin-top: 20px;
             border-top: 1px solid var(--border);
             padding-top: 12px;
         }
 
-        .departed-toggle {
+        .graveyard-toggle {
             background: none;
             border: none;
             color: var(--text-dim);
@@ -522,11 +586,43 @@
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 10px;
             transition: color 0.3s;
         }
 
-        .departed-toggle:hover { color: var(--danger); }
+        .graveyard-toggle:hover { color: var(--danger); }
+
+        .graveyard-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .graveyard-chip {
+            padding: 4px 10px;
+            background: rgba(255, 51, 102, 0.06);
+            border: 1px solid rgba(255, 51, 102, 0.15);
+            border-radius: 20px;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-decoration: line-through;
+        }
+
+        .pick-label {
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        @media (max-width: 500px) {
+            .arena-person {
+                width: 20px;
+                height: 20px;
+                font-size: 0.35rem;
+            }
+        }
 
         /* Voting Section */
         .voter-panel {
@@ -1114,12 +1210,21 @@
                 <div class="round-num" id="round-display">Round 1</div>
                 <div class="round-status" id="round-status">Voting is open</div>
             </div>
-            <div class="board-search">
-                <input type="text" id="board-search" placeholder="Search teammates..." oninput="filterBoard()">
+            <div class="arena-controls">
+                <div class="arena-search">
+                    <input type="text" id="arena-search" placeholder="Search combatants..." oninput="filterBoard()">
+                </div>
+                <div class="arena-legend">
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--danger)"></div> Danger</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--warning)"></div> Caution</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> Safe</div>
+                </div>
             </div>
-            <div class="board-count" id="board-count"></div>
-            <div class="roster-grid" id="roster-grid"></div>
-            <div id="departed-area"></div>
+            <div class="arena-wrapper">
+                <div class="arena-container" id="arena-inner"></div>
+            </div>
+            <div class="arena-count" id="arena-count"></div>
+            <div id="graveyard-area"></div>
         </div>
 
         <!-- CAST VOTES -->
@@ -1439,7 +1544,7 @@
             return {
                 teammates: DEFAULT_ROSTER.map(name => ({ id: genId(), name, role: 'Team Member' })),
                 voters: [],
-                votes: {},       // { round: { voterId: teammateId } }
+                votes: {},       // { round: { voterId: [tid1, tid2, tid3] } }
                 round: 1,
                 history: [],     // { date, departedName, correctVoters[] }
                 departed: [],    // teammate IDs
@@ -1568,10 +1673,10 @@
         }
 
         function renderBoard() {
-            const grid = document.getElementById('roster-grid');
-            const departedArea = document.getElementById('departed-area');
-            const countEl = document.getElementById('board-count');
-            const searchTerm = (document.getElementById('board-search')?.value || '').toLowerCase();
+            const arena = document.getElementById('arena-inner');
+            const graveyardArea = document.getElementById('graveyard-area');
+            const countEl = document.getElementById('arena-count');
+            const searchTerm = (document.getElementById('arena-search')?.value || '').toLowerCase();
             const roundVotes = data.votes[data.round] || {};
             const activeTeammates = data.teammates.filter(t => !data.departed.includes(t.id));
             const departedTeammates = data.teammates.filter(t => data.departed.includes(t.id));
@@ -1583,75 +1688,106 @@
                 : `${Object.keys(roundVotes).length} of ${data.voters.length} votes cast`;
 
             if (data.teammates.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
-                        <div class="icon">&#x1F3CA;</div>
-                        <p>No teammates on the roster yet.</p>
-                        <p style="font-size:0.8rem; margin-top:8px;">Head to Admin to add the Edge Impulse crew.</p>
+                arena.innerHTML = `
+                    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+                        <div style="font-size:2rem;">&#x1F3CA;</div>
+                        <p style="font-size:0.75rem;color:var(--text-dim);">No combatants yet.</p>
                     </div>`;
                 countEl.textContent = '';
-                departedArea.innerHTML = '';
+                graveyardArea.innerHTML = '';
                 return;
             }
 
-            // Count votes per teammate
+            // Count votes per teammate (from arrays)
             const voteCounts = {};
-            Object.values(roundVotes).forEach(tid => {
-                voteCounts[tid] = (voteCounts[tid] || 0) + 1;
+            Object.values(roundVotes).forEach(picks => {
+                const arr = Array.isArray(picks) ? picks : [picks];
+                arr.forEach(tid => { if (tid) voteCounts[tid] = (voteCounts[tid] || 0) + 1; });
             });
 
-            // Filter active by search
-            const filteredActive = activeTeammates
-                .filter(t => !searchTerm || t.name.toLowerCase().includes(searchTerm) || t.role.toLowerCase().includes(searchTerm))
-                .sort((a, b) => (voteCounts[b.id] || 0) - (voteCounts[a.id] || 0));
+            // Dimmed set for search filtering
+            const dimmedIds = searchTerm ? new Set(activeTeammates.filter(t =>
+                !t.name.toLowerCase().includes(searchTerm)).map(t => t.id)) : new Set();
+            const filteredCount = searchTerm ? activeTeammates.filter(t =>
+                t.name.toLowerCase().includes(searchTerm)).length : activeTeammates.length;
 
             countEl.textContent = searchTerm
-                ? `${filteredActive.length} of ${activeTeammates.length} active`
+                ? `${filteredCount} of ${activeTeammates.length} active`
                 : `${activeTeammates.length} active \u00b7 ${departedTeammates.length} departed`;
 
-            function renderCard(t) {
-                const isDeparted = data.departed.includes(t.id);
-                const idx = data.teammates.indexOf(t);
-                const votes = voteCounts[t.id] || 0;
-                return `
-                    <div class="roster-card ${isDeparted ? 'departed' : ''}">
-                        <button class="remove-btn" onclick="removeTeammate('${t.id}')" title="Remove">&times;</button>
-                        <div class="avatar" style="background:${getColor(idx)}">${getInitials(t.name)}</div>
-                        <div class="name" title="${t.name}">${t.name}</div>
-                        <div class="role" title="${t.role}">${t.role}</div>
-                        ${!isDeparted && votes > 0 ? `
-                            <div class="vote-count">${votes}</div>
-                            <div class="vote-label">vote${votes !== 1 ? 's' : ''}</div>
-                        ` : ''}
-                    </div>`;
-            }
+            // Group into tiers by vote count: 0, 1, 2, 3+
+            const tiers = [[], [], [], []];
+            activeTeammates.forEach(t => {
+                const v = voteCounts[t.id] || 0;
+                tiers[Math.min(v, 3)].push(t);
+            });
 
-            grid.innerHTML = filteredActive.map(renderCard).join('');
+            // Ring radii (% from center): tier3=innermost(danger), tier0=outermost(safe)
+            const radii = [42, 33, 24, 14];
+            const tierColors = ['var(--accent)', '#88cc44', 'var(--warning)', 'var(--danger)'];
 
-            // Departed section (collapsible, hidden by default)
-            if (departedTeammates.length > 0 && !searchTerm) {
-                const filteredDeparted = departedTeammates;
-                departedArea.innerHTML = `
-                    <div class="departed-section">
-                        <button class="departed-toggle" onclick="toggleDeparted()">
-                            ${departedVisible ? '\u25BC' : '\u25B6'} Departed (${filteredDeparted.length})
-                        </button>
-                        ${departedVisible ? `<div class="roster-grid">${filteredDeparted.map(renderCard).join('')}</div>` : ''}
-                    </div>`;
-            } else if (searchTerm) {
-                const matchedDeparted = departedTeammates.filter(t =>
-                    t.name.toLowerCase().includes(searchTerm) || t.role.toLowerCase().includes(searchTerm));
-                if (matchedDeparted.length > 0) {
-                    departedArea.innerHTML = `
-                        <div class="departed-section">
-                            <button class="departed-toggle" style="color:var(--danger)">Departed matches (${matchedDeparted.length})</button>
-                            <div class="roster-grid">${matchedDeparted.map(renderCard).join('')}</div>
-                        </div>`;
-                } else {
-                    departedArea.innerHTML = '';
+            // Static ring guides + center skull
+            let html = `
+                <div class="arena-ring safe"></div>
+                <div class="arena-ring caution"></div>
+                <div class="arena-ring danger"></div>
+                <div class="arena-center">
+                    <div style="font-size:1.4rem;">&#x1F480;</div>
+                    <div style="font-size:0.5rem;color:var(--danger);font-weight:600;letter-spacing:1px;margin-top:2px;">DANGER ZONE</div>
+                </div>`;
+
+            // Position people in concentric rings
+            tiers.forEach((tierPeople, tierIdx) => {
+                if (tierPeople.length === 0) return;
+                const radius = radii[tierIdx];
+                const color = tierColors[tierIdx];
+
+                // Split into sub-rings if too crowded
+                const maxPerRing = Math.max(12, Math.floor(2 * Math.PI * radius * 0.68 / 3));
+                const subRings = [];
+                for (let i = 0; i < tierPeople.length; i += maxPerRing) {
+                    subRings.push(tierPeople.slice(i, i + maxPerRing));
                 }
+
+                subRings.forEach((ring, ri) => {
+                    const r = radius - (ri * 4);
+                    ring.forEach((t, i) => {
+                        const angle = (2 * Math.PI * i / ring.length) - Math.PI / 2;
+                        const x = 50 + r * Math.cos(angle);
+                        const y = 50 + r * Math.sin(angle);
+                        const idx = data.teammates.indexOf(t);
+                        const votes = voteCounts[t.id] || 0;
+                        const dimmed = dimmedIds.has(t.id);
+                        const votedClass = votes > 0 ? 'voted' : '';
+
+                        html += `
+                            <div class="arena-person ${votedClass}"
+                                 style="left:${x.toFixed(2)}%;top:${y.toFixed(2)}%;background:${getColor(idx)};${dimmed ? 'opacity:0.15;' : ''}"
+                                 title="${t.name}">
+                                ${getInitials(t.name)}
+                                <div class="person-tooltip">
+                                    <strong>${t.name}</strong>
+                                    ${votes > 0 ? `<br><span style="color:${color}">${votes} vote${votes !== 1 ? 's' : ''}</span>` : ''}
+                                </div>
+                            </div>`;
+                    });
+                });
+            });
+
+            arena.innerHTML = html;
+
+            // Graveyard for departed
+            if (departedTeammates.length > 0) {
+                const chips = departedTeammates
+                    .filter(t => !searchTerm || t.name.toLowerCase().includes(searchTerm))
+                    .map(t => `<span class="graveyard-chip">&#x1F480; ${t.name}</span>`).join('');
+                graveyardArea.innerHTML = `
+                    <div class="graveyard">
+                        <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:8px;">&#x26B0;&#xFE0F; Graveyard (${departedTeammates.length})</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;">${chips}</div>
+                    </div>`;
             } else {
-                departedArea.innerHTML = '';
+                graveyardArea.innerHTML = '';
             }
         }
 
@@ -1673,11 +1809,31 @@
             }
 
             panel.innerHTML = data.voters.map((v, i) => {
-                const currentVote = roundVotes[v.id];
-                const picked = currentVote ? data.teammates.find(t => t.id === currentVote) : null;
+                const rawPicks = roundVotes[v.id];
+                const picks = rawPicks ? (Array.isArray(rawPicks) ? rawPicks : [rawPicks]) : [];
+                const hasVoted = picks.length > 0 && picks.some(p => p);
+
+                const selects = [0, 1, 2].map(si => {
+                    const current = picks[si] || '';
+                    return `
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span class="pick-label">Pick ${si + 1}</span>
+                            <select class="vote-select" id="vote-sel-${v.id}-${si}" style="flex:1;">
+                                <option value="">-- Pick #${si + 1} --</option>
+                                ${activeTeammates.map(t => `
+                                    <option value="${t.id}" ${current === t.id ? 'selected' : ''}>${t.name}</option>
+                                `).join('')}
+                            </select>
+                        </div>`;
+                }).join('');
+
+                const pickedNames = picks.map(p => {
+                    const t = data.teammates.find(t => t.id === p);
+                    return t ? t.name : null;
+                }).filter(Boolean);
 
                 return `
-                    <div class="voter-card ${picked ? 'has-voted' : ''}">
+                    <div class="voter-card ${hasVoted ? 'has-voted' : ''}">
                         <div class="voter-header">
                             <div class="voter-avatar" style="background:${getColor(i + 4)}">${getInitials(v.name)}</div>
                             <div>
@@ -1685,18 +1841,15 @@
                                 <div class="voter-score">${v.score || 0} pts</div>
                             </div>
                         </div>
-                        <select class="vote-select" id="vote-sel-${v.id}">
-                            <option value="">-- Pick who's next --</option>
-                            ${activeTeammates.map(t => `
-                                <option value="${t.id}" ${currentVote === t.id ? 'selected' : ''}>${t.name} (${t.role})</option>
-                            `).join('')}
-                        </select>
+                        <div style="display:flex;flex-direction:column;gap:6px;">
+                            ${selects}
+                        </div>
                         <button class="vote-btn" onclick="castVote('${v.id}')">
-                            ${picked ? 'Change Vote' : 'Lock It In'}
+                            ${hasVoted ? 'Change Votes' : 'Lock It In'}
                         </button>
-                        ${picked ? `
+                        ${pickedNames.length > 0 ? `
                             <div class="current-pick">
-                                Current pick: <strong>${picked.name}</strong>
+                                Picks: <strong>${pickedNames.join(', ')}</strong>
                             </div>` : ''}
                     </div>`;
             }).join('');
@@ -1788,10 +1941,16 @@
             if (!confirm(`Remove ${t.name} from the roster entirely?`)) return;
             data.teammates = data.teammates.filter(t => t.id !== id);
             data.departed = data.departed.filter(d => d !== id);
-            // Clean votes
+            // Clean votes (handle both array and legacy single-value formats)
             Object.keys(data.votes).forEach(round => {
                 Object.keys(data.votes[round]).forEach(vid => {
-                    if (data.votes[round][vid] === id) delete data.votes[round][vid];
+                    const picks = data.votes[round][vid];
+                    if (Array.isArray(picks)) {
+                        data.votes[round][vid] = picks.filter(p => p !== id);
+                        if (data.votes[round][vid].length === 0) delete data.votes[round][vid];
+                    } else if (picks === id) {
+                        delete data.votes[round][vid];
+                    }
                 });
             });
             saveData(data);
@@ -1824,18 +1983,24 @@
         }
 
         function castVote(voterId) {
-            const sel = document.getElementById(`vote-sel-${voterId}`);
-            const teammateId = sel.value;
-            if (!teammateId) return showToast('Pick someone first!', 'error');
+            const picks = [0, 1, 2].map(i =>
+                document.getElementById(`vote-sel-${voterId}-${i}`).value
+            ).filter(v => v);
+
+            if (picks.length === 0) return showToast('Pick at least one person!', 'error');
+
+            // Check for duplicates
+            const unique = new Set(picks);
+            if (unique.size !== picks.length) return showToast('No duplicate picks allowed!', 'error');
 
             if (!data.votes[data.round]) data.votes[data.round] = {};
-            data.votes[data.round][voterId] = teammateId;
+            data.votes[data.round][voterId] = picks;
             saveData(data);
 
             const voter = data.voters.find(v => v.id === voterId);
-            const teammate = data.teammates.find(t => t.id === teammateId);
+            const names = picks.map(p => data.teammates.find(t => t.id === p)?.name).filter(Boolean);
             render();
-            showToast(`${voter.name} locked in: ${teammate.name}`, 'success');
+            showToast(`${voter.name} locked in: ${names.join(', ')}`, 'success');
         }
 
         function markDeparted() {
@@ -1851,8 +2016,9 @@
             // Check who predicted correctly this round
             const roundVotes = data.votes[data.round] || {};
             const correctVoters = [];
-            Object.entries(roundVotes).forEach(([voterId, pickedId]) => {
-                if (pickedId === id) {
+            Object.entries(roundVotes).forEach(([voterId, picks]) => {
+                const arr = Array.isArray(picks) ? picks : [picks];
+                if (arr.includes(id)) {
                     const voter = data.voters.find(v => v.id === voterId);
                     if (voter) {
                         voter.score = (voter.score || 0) + 10;
